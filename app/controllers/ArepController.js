@@ -72,10 +72,17 @@ class ArepController {
       }
     } else {
       dtAnggota = await tb_arep.findAll({
-        where: { id_user: req.params.id_user },
+        where: { id: req.params.id_user },
         order: [["id_user", "ASC"]],
       });
-      
+      // console.log(dtAnggota[0].dataValues);
+      let objData = dtAnggota[0].dataValues
+      const dtUser = await tb_user.findAll({ where: { id: dtAnggota[0].dataValues.id_user }, order: [["id", "ASC"]] });
+      objData.email = dtUser[0].dataValues.email
+      objData.nama = dtUser[0].dataValues.nama
+      // console.log(dtUser[0].dataValues);
+      dataArep.push(objData)
+      // dataArep.push(dtAnggota)
     }
     if (!dtAnggota) {
       status = 404;
@@ -155,13 +162,16 @@ class ArepController {
     let status;
     let message;
     let id;
-    let dtAnggota;
+    let dtAnggota,dtUser;
 
     const update = {
         nik: req.body.nik,
         tempat_lahir: req.body.tempat_lahir,
         tanggal_lahir: req.body.tanggal_lahir,
         wilayah: req.body.wilayah,
+    };
+    const updateUser = {
+        nama: req.body.nama
     };
 
     if (req.params.id_user == null) {
@@ -170,16 +180,19 @@ class ArepController {
       id_user = null;
     } else {
       const dtSAnggota = await tb_arep.findOne({
-        where: { id_user: req.params.id_user },
+        where: { id: req.params.id_user },
       });
-
+      console.log(dtSAnggota.dataValues);
       if (!dtSAnggota) {
         status = 404;
         message = "Data Member Tidak Ditemukan";
         id = null;
       } else {
         dtAnggota = await tb_arep.update(update, {
-          where: { id_user: req.params.id_user },
+          where: { id: req.params.id_user },
+        });
+        dtUser = await tb_user.update(updateUser, {
+          where: { id: dtSAnggota.dataValues.id_user },
         });
         status = 200;
         message = "Sukses";

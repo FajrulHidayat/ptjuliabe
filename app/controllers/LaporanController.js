@@ -43,7 +43,7 @@ class LaporanController {
         status: "Baru",
         koreksi: ""
         };
-        // console.log(item);
+        console.log(item);
         // const dtSAnggota = await tb_komentar.findOne({
         //   where: { nim: req.body.nim },
         // });
@@ -357,6 +357,7 @@ class LaporanController {
    
     const update = {
       koreksi: req.body.koreksi,
+      status: "Revisi"
     };
 
     if (req.params.id_laporan == null) {
