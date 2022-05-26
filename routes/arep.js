@@ -8,7 +8,6 @@ router.put("/:id_user", arep.UpdateData);
 router.put("/foto/:id", arep.UpdateImage);
 router.get("/", arep.SelectData);
 router.get("/wilayah", arep.SelectWilayah);
-
 router.get("/arep/:id_user", arep.SelectData);
 router.delete("/:id_user", arep.DeleteData);
 

@@ -131,6 +131,107 @@ class LaporanController {
     };
     return res.status(status).json(data);
   }
+  async SelectJumlah(req, res) {
+    //set diagnostic
+    req.start = Date.now();
+    let status;
+    let message;
+    let dtAnggota,LMasuk,LKoreksi,LSetuju,TArep;
+
+    //get data
+      LMasuk = await tb_laporan.count({
+        where: {
+        status: "Baru"
+      } });
+      LKoreksi = await tb_laporan.count({
+        where: {
+        status: "Koreksi"
+      } });
+      LSetuju = await tb_laporan.count({
+        where: {
+        status: "Setuju"
+      } });
+      TArep = await tb_arep.count();
+      dtAnggota={baru:LMasuk,koreksi:LKoreksi,setuju:LSetuju,arep:TArep}
+      console.log(LMasuk);
+    if (!dtAnggota) {
+      status = 404;
+      message = "Data Member Tidak Ditemukan";
+    } else {
+      status = 200;
+      message = "Sukses";
+    }
+    // .then(angg=>{
+    //     res.json(angg)
+    // })
+    // return res.status(200).send({
+    //     message : 'Data Anggota Belum ada'
+    // })
+
+    //get diagnostic
+    let time = Date.now() - req.start;
+    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+    const data = {
+      diagnostic: {
+        status: status,
+        message: message,
+        memoryUsage: `${Math.round(used * 100) / 100} MB`,
+        elapsedTime: time,
+        timestamp: Date(Date.now()).toString(),
+      },
+      result: [dtAnggota],
+    };
+    return res.status(status).json(data);
+  }
+  async SelectJumlahPimpinan(req, res) {
+    //set diagnostic
+    req.start = Date.now();
+    let status;
+    let message;
+    let dtAnggota,LPajak,LSetuju,TArep;
+
+    //get data
+      
+      LSetuju = await tb_laporan.count({
+        where: {
+        status: "Setuju"
+      } });
+      LPajak = await tb_laporan.count({
+        where: {
+        status: "Pajak"
+      } });
+      TArep = await tb_arep.count();
+      dtAnggota={setuju:LSetuju,pajak:LPajak,arep:TArep}
+      // console.log(LMasuk);
+    if (!dtAnggota) {
+      status = 404;
+      message = "Data Member Tidak Ditemukan";
+    } else {
+      status = 200;
+      message = "Sukses";
+    }
+    // .then(angg=>{
+    //     res.json(angg)
+    // })
+    // return res.status(200).send({
+    //     message : 'Data Anggota Belum ada'
+    // })
+
+    //get diagnostic
+    let time = Date.now() - req.start;
+    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+    const data = {
+      diagnostic: {
+        status: status,
+        message: message,
+        memoryUsage: `${Math.round(used * 100) / 100} MB`,
+        elapsedTime: time,
+        timestamp: Date(Date.now()).toString(),
+      },
+      result: [dtAnggota],
+    };
+    return res.status(status).json(data);
+  }
   async SelectWhere(req, res) {
     //set diagnostic
     req.start = Date.now();
