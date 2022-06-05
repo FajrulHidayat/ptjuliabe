@@ -72,7 +72,7 @@ class ArepController {
       }
     } else {
       dtAnggota = await tb_arep.findAll({
-        where: { id: req.params.id_user },
+        where: { id_user: req.params.id_user },
         order: [["id_user", "ASC"]],
       });
       // console.log(dtAnggota[0].dataValues);
