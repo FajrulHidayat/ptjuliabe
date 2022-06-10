@@ -81,11 +81,11 @@ class LaporanController {
     let dtAnggota;
 
     //get data
-    console.log(Object.keys(req.query)[0]);
-    console.log(req.query[Object.keys(req.query)[0]]);
+    // console.log(Object.keys(req.query)[0]);
+    // console.log(req.query[Object.keys(req.query)[0]]);
     let col =Object.keys(req.query)[0]
     const whe = {[col]:req.query[Object.keys(req.query)[0]]}
-    console.log(whe);
+    // console.log(whe);
     if (req.params.id_arep == null && req.params.id == null) {
       // console.log(req.params);
       dtAnggota = await tb_laporan.findAll({ order: [["id", "ASC"]] });
@@ -237,7 +237,7 @@ class LaporanController {
     req.start = Date.now();
     let status;
     let message;
-    let dtAnggota;
+    let dtAnggota=[];
     let dtAnggotas=[];
 
     //get data
@@ -245,16 +245,16 @@ class LaporanController {
     // console.log(req.query[Object.keys(req.query)[0]]);
     let col =Object.keys(req.query)[0]
     const whe = {[col]:req.query[Object.keys(req.query)[0]]}
-    // console.log(whe);
+    console.log(whe);
     if(col === "wilayah"){
       const dtArep = await tb_arep.findAll({
-        where: {wilayah:req.query[Object.keys(req.query)[0]]},
+        where:whe,
         order: [["id", "ASC"]],
       });
       // console.log("1");
       // console.log(dtArep[0].dataValues);
       await Promise.all(dtArep.map(async(element) => {
-        // console.log(element.dataValues.id);
+        console.log(element.dataValues.id);
         const dtLaporan = await tb_laporan.findAll({
           where: {id_arep:`${element.dataValues.id}`},
           order: [["id", "ASC"]],
@@ -262,7 +262,8 @@ class LaporanController {
         
         // dtAnggota.push(dtLaporan)
         await Promise.all(dtLaporan.map(async(el) => {
-          // console.log(element);
+          console.log("el");
+          console.log(el);
           const dtUser = await tb_user.findAll({
             where: {id:`${element.dataValues.id_user}`},
             order: [["id", "ASC"]],
@@ -272,6 +273,7 @@ class LaporanController {
           }))
           // el.dataValues.nama=element.dataValues.nama
           el.dataValues.wilayah=element.dataValues.wilayah
+          // console.log(el);
           dtAnggota.push(el)
         })) ;
         // console.log(dtLaporan);
@@ -350,6 +352,7 @@ class LaporanController {
       }
       const update = {
         file: res.req.file.filename,
+        status:"Baru"
       };
       console.log(res.req.file.filename);
       if (req.params.id_laporan == null) {
