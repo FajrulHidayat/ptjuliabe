@@ -182,7 +182,7 @@ class ArepController {
       const dtSAnggota = await tb_arep.findOne({
         where: { id: req.params.id_user },
       });
-      console.log(dtSAnggota.dataValues);
+      // console.log(dtSAnggota.dataValues);
       if (!dtSAnggota) {
         status = 404;
         message = "Data Member Tidak Ditemukan";
