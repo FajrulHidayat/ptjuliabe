@@ -3,72 +3,73 @@ const authService = require("../services/authService");
 const { default: axios } = require("axios");
 
 class Authentication {
-  async regis(req, res,next) {
-      req.start = Date.now();
-      let status;
-      let message;
-      let dtUser;
-      let foto;
-      let id;
-      // if (err instanceof multer.MulterError) {
-      //   // a multer error occurred when uploading
-      //   return res.status(200).json(err);
-      // } else if (err) {
-      //   return res.status(200).json(err);
-      // }
-      // const imagePath = path.join(__dirname, "../../public/image/pegawai");
-      // const fileUpload = new resize(imagePath);
-      // foto = await fileUpload.save(req.file.buffer, req.file.originalname);
-      const item = {
-        nama: req.body.nama,
-        email: req.body.email,
-        password: req.body.password,
-        role: req.body.role,
-        foto:"blankProfile.png"
-      };
-      // console.log(item);
-      const dtSUser = await tb_user.findOne({
-        where: { email: item.email },
-      });
-      if (!dtSUser) {
-        dtUser = await tb_user.create(item);
-        status = 200;
-        message = "Akun Berhasil Dibuat";
-        if (dtUser.role === "arep") {
-          const arep={
-            id_user:dtUser.id,
-            nik : req.body.nik,
-            tempat_lahir:req.body.tempat_lahir,
-            tanggal_lahir:req.body.tanggal_lahir,
-            wilayah:req.body.wilayah
-          }
-          axios.post("http://localhost:9000/arep",arep)
-          .then(function(res){
-            console.log(res.status)
+  async regis(req, res, next) {
+    req.start = Date.now();
+    let status;
+    let message;
+    let dtUser;
+    let foto;
+    let id;
+    // if (err instanceof multer.MulterError) {
+    //   // a multer error occurred when uploading
+    //   return res.status(200).json(err);
+    // } else if (err) {
+    //   return res.status(200).json(err);
+    // }
+    // const imagePath = path.join(__dirname, "../../public/image/pegawai");
+    // const fileUpload = new resize(imagePath);
+    // foto = await fileUpload.save(req.file.buffer, req.file.originalname);
+    const item = {
+      nama: req.body.nama,
+      email: req.body.email,
+      password: req.body.password,
+      role: req.body.role,
+      foto: "blankProfile.png",
+    };
+    // console.log(item);
+    const dtSUser = await tb_user.findOne({
+      where: { email: item.email },
+    });
+    if (!dtSUser) {
+      dtUser = await tb_user.create(item);
+      status = 200;
+      message = "Akun Berhasil Dibuat";
+      if (dtUser.role === "arep") {
+        const arep = {
+          id_user: dtUser.id,
+          // nik : req.body.nik,
+          tempat_lahir: req.body.tempat_lahir,
+          tanggal_lahir: req.body.tanggal_lahir,
+          wilayah: req.body.wilayah,
+        };
+        axios
+          .post("http://localhost:9000/arep", arep)
+          .then(function (res) {
+            console.log(res.status);
             next();
           })
-          .catch(function(err){
+          .catch(function (err) {
             console.log(err);
-          })
-        }
-      } else if (dtSUser.email === item.email) {
-        status = 401;
-        message = "Akun Sudah Ada";
+          });
       }
+    } else if (dtSUser.email === item.email) {
+      status = 401;
+      message = "Akun Sudah Ada";
+    }
 
-      //get diagnostic
-      let time = Date.now() - req.start;
-      const used = process.memoryUsage().heapUsed / 1024 / 1024;
-      const data = {
-        diagnostic: {
-          memoryUsage: `${Math.round(used * 100) / 100} MB`,
-          elapsedTime: time,
-          timestamp: Date(Date.now()).toString(),
-          status: status,
-          message: message,
-        },
-      };
-      return res.status(status).json(data);
+    //get diagnostic
+    let time = Date.now() - req.start;
+    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+    const data = {
+      diagnostic: {
+        memoryUsage: `${Math.round(used * 100) / 100} MB`,
+        elapsedTime: time,
+        timestamp: Date(Date.now()).toString(),
+        status: status,
+        message: message,
+      },
+    };
+    return res.status(status).json(data);
   }
   async login(req, res) {
     req.start = Date.now();
@@ -120,7 +121,7 @@ class Authentication {
     res.set({ "Access-Control-Expose-Headers": "Authorization" });
     return res.status(status).json(data);
   }
-  
+
   //  validation
   async verify(req, res) {
     req.start = Date.now();
