@@ -202,18 +202,87 @@ class Authentication {
     };
     return res.status(status).json(data);
   }
-  // async logout(req, res) {
-  //   const token = req.header("Authorization").split("Bearer ")[1];
+  async SetToken(req, res) {
+    req.start = Date.now();
+    let status;
+    let message, dtAnggota;
+    let id;
+    const update = {
+      fcm_token: req.body.fcm_token,
+    };
 
-  //   authService().blacklist(token, (err) => {
-  //     if (err) {
-  //       return res.status(401).json({ isvalid: false, err: "Invalid Token!" });
-  //     }
+    if (req.params.id == null) {
+      status = 403;
+      message = "ID harus tercantumkan";
+      id = null;
+    } else {
+      const dtSAnggota = await tb_user.findOne({
+        where: { id: req.params.id },
+      });
 
-  //     return res.status(200).json({ isvalid: true });
-  //   });
-  //   return res.status(401).json({ isvalid: "token revoked" });
-  // }
+      if (!dtSAnggota) {
+        status = 404;
+        message = "Data Member Tidak Ditemukan";
+        id = null;
+      } else {
+        dtAnggota = await tb_user.update(update, {
+          where: { id: req.params.id },
+        });
+
+        status = 200;
+        message = "Sukses";
+        id = dtSAnggota.id;
+      }
+    }
+
+    //get diagnostic
+    let time = Date.now() - req.start;
+    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+    const data = {
+      diagnostic: {
+        status: status,
+        message: message,
+        memoryUsage: `${Math.round(used * 100) / 100} MB`,
+        elapsedTime: time,
+        timestamp: Date(Date.now()).toString(),
+      },
+      result: id,
+    };
+    return res.status(status).json(data);
+  }
+  async GetToken(req, res) {
+    req.start = Date.now();
+    let status;
+    let message;
+    let response = {};
+    const dtMember = await tb_user.findOne({ where: { id: req.params.id } });
+    if (!dtMember) {
+      status = 404;
+      message = "Data user tidak ditemukan";
+    } else {
+      // const match = await bcrypt.compare(password, dtMember.password);
+      // if (match === false) {
+
+      status = 200;
+      message = "get Token berhasil";
+      response = {
+        fcm_token: dtMember.fcm_token,
+      };
+    }
+    let time = Date.now() - req.start;
+    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+    const data = {
+      diagnostic: {
+        status: status,
+        message: message,
+        memoryUsage: `${Math.round(used * 100) / 100} MB`,
+        elapsedTime: time,
+        timestamp: Date(Date.now()).toString(),
+      },
+      result: response,
+    };
+    return res.status(status).json(data);
+  }
 }
 const auth = new Authentication();
 module.exports = auth;

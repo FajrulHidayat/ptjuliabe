@@ -1,4 +1,5 @@
 const { tb_laporan, tb_arep, tb_user } = require("../models");
+const sendNotification = require("../services/NotificationService");
 const path = require("path");
 const multer = require("multer");
 const { unlinkSync } = require("fs");
@@ -28,17 +29,10 @@ class LaporanController {
       let file;
       let id;
       if (err instanceof multer.MulterError) {
-        // a multer error occurred when uploading
         return res.status(200).json(err);
       } else if (err) {
         return res.status(200).json(err);
       }
-      // console.log(res.req.file.originalname);
-      // const imagePath = path.join(__dirname, "../../public/file");
-      // // const fileUpload = new resize(imagePath);
-      // file = await fileUpload.save(req.file.buffer, req.file.originalname);
-      // // if(req.body.password == req.body.confirmPassword)
-      // console.log(res.req);
       const item = {
         id_arep: req.body.id_arep,
         judul: req.body.judul,
@@ -46,19 +40,9 @@ class LaporanController {
         status: "Baru",
         koreksi: "",
       };
-      console.log(item);
-      // const dtSAnggota = await tb_komentar.findOne({
-      //   where: { nim: req.body.nim },
-      // });
-
-      // if (dtSAnggota) {
-      //   status = 404;
-      //   message = "Data Sudah Ada";
-      // } else {
       dtAnggota = await tb_laporan.create(item);
       status = 200;
       message = "Berhasil Input Data";
-      // }
       //get diagnostic
       let time = Date.now() - req.start;
       const used = process.memoryUsage().heapUsed / 1024 / 1024;
@@ -73,6 +57,13 @@ class LaporanController {
           messagae: message,
         },
       };
+      const dtOP = await tb_user.findOne({ where: { role: "operator" } });
+      sendNotification(
+        dtOP.fcm_token,
+        req.body.body,
+        req.body.title,
+        `http://localhost:3000/PeriksaLaporan?id=${dtAnggota.id}`
+      );
       return res.status(status).json(data);
     });
   }
@@ -466,6 +457,16 @@ class LaporanController {
         dtAnggota = await tb_laporan.update(update, {
           where: { id: req.params.id_laporan },
         });
+        const dtArep = await tb_arep.findOne({
+          where: { id: dtSAnggota.id_arep },
+        });
+        const dtUser = await tb_user.findOne({ where: { id: dtArep.id_user } });
+        sendNotification(
+          dtUser.fcm_token,
+          `Laporan Anda Berubah Status menjadi ${req.body.status}`,
+          "Perubahan Status",
+          `http://localhost:3000/laporan?id=${req.params.id_laporan}&status=${req.body.status}`
+        );
         status = 200;
         message = "Sukses";
         id_laporan = dtSAnggota.id;
@@ -517,6 +518,16 @@ class LaporanController {
         dtAnggota = await tb_laporan.update(update, {
           where: { id: req.params.id_laporan },
         });
+        const dtArep = await tb_arep.findOne({
+          where: { id: dtSAnggota.id_arep },
+        });
+        const dtUser = await tb_user.findOne({ where: { id: dtArep.id_user } });
+        sendNotification(
+          dtUser.fcm_token,
+          `Laporan Anda Mendapatkan Revisi`,
+          "Revisi Laporan",
+          `http://localhost:3000/laporan?id=${req.params.id_laporan}&status=Revisi`
+        );
         status = 200;
         message = "Sukses";
         id_laporan = dtSAnggota.id;
