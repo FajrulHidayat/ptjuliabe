@@ -467,6 +467,17 @@ class LaporanController {
           "Perubahan Status",
           `http://localhost:3000/laporan?id=${req.params.id_laporan}&status=${req.body.status}`
         );
+        if (req.body.status === "Setuju") {
+          const dtPimpinan = await tb_user.findOne({
+            where: { role: "pimpinan" },
+          });
+          sendNotification(
+            dtPimpinan.fcm_token,
+            "Laporan Penanggung Jawab telah divalidasi oleh Operator",
+            `Laporan Baru`,
+            `http://localhost:3000/PimpinanPeriksaLaporan?id=${req.params.id_laporan}`
+          );
+        }
         status = 200;
         message = "Sukses";
         id_laporan = dtSAnggota.id;
@@ -499,6 +510,7 @@ class LaporanController {
     const update = {
       koreksi: req.body.koreksi,
       status: "Revisi",
+      pengoreksi: req.body.pengoreksi,
     };
 
     if (req.params.id_laporan == null) {

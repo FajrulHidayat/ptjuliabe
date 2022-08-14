@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class tb_laporan extends Model {
     /**
@@ -12,16 +10,20 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
-  tb_laporan.init({
-    id_arep: DataTypes.STRING,
-    judul: DataTypes.STRING,
-    file: DataTypes.STRING,
-    status: DataTypes.STRING,
-    koreksi: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'tb_laporan',
-  });
+  }
+  tb_laporan.init(
+    {
+      id_arep: DataTypes.STRING,
+      judul: DataTypes.STRING,
+      file: DataTypes.STRING,
+      status: DataTypes.STRING,
+      koreksi: DataTypes.STRING,
+      pengoreksi: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "tb_laporan",
+    }
+  );
   return tb_laporan;
 };
