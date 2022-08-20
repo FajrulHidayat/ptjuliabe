@@ -412,7 +412,7 @@ class LaporanController {
           const dtOP = await tb_user.findOne({ where: { role: "operator" } });
           sendNotification(
             dtOP.fcm_token,
-            "Laporan Telah Diperbaharui Oleh Penganggung Jawab ",
+            "Laporan Telah Diperbaharui Oleh Penanggung Jawab ",
             "Laporan Diperbaharui",
             `http://localhost:3000/PeriksaLaporan?id=${req.params.id_laporan}`
           );
