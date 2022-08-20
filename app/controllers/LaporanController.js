@@ -409,6 +409,13 @@ class LaporanController {
           status = 200;
           message = "Sukses";
           id_laporan = dtSAnggota.id;
+          const dtOP = await tb_user.findOne({ where: { role: "operator" } });
+          sendNotification(
+            dtOP.fcm_token,
+            "Laporan Telah Diperbaharui Oleh Penganggung Jawab ",
+            "Laporan Diperbaharui",
+            `http://localhost:3000/PeriksaLaporan?id=${req.params.id_laporan}`
+          );
         }
       }
 
