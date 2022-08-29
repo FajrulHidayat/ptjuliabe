@@ -547,6 +547,17 @@ class LaporanController {
           "Revisi Laporan",
           `http://localhost:3000/laporan?id=${req.params.id_laporan}&status=Revisi`
         );
+        if (req.body.pengoreksi === "pimpinan") {
+          const dtOperator = await tb_user.findOne({
+            where: { role: "operator" },
+          });
+          sendNotification(
+            dtOperator.fcm_token,
+            `Laporan Arep Mendapatkan Revisi oleh Pimpinan`,
+            "Revisi Laporan",
+            `http://localhost:3000/PeriksaLaporanRevisi?id=${req.params.id_laporan}`
+          );
+        }
         status = 200;
         message = "Sukses";
         id_laporan = dtSAnggota.id;
